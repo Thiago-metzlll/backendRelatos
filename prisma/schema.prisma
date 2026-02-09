@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  email      String   @unique
+  senha      String
+  createdAt  DateTime @default(now()) @map("created_at")
+  
+  posts      Post[]
+  votos      Voto[]
+
+  @@map("users")
+}
+
+model TipoRelato {
+  id         Int      @id @default(autoincrement()) @map("id_relato")
+  nome       String
+  descricao  String?  @map("descricao")
+  
+  posts      Post[]
+
+  @@map("tipos_de_relatos")
+}
+
+model Post {
+  id            Int        @id @default(autoincrement()) @map("id_post")
+  userId        Int        @map("id_user")
+  tipoRelatoId  Int        @map("id_relato")
+  conteudo      String
+  quantidadeVts Int        @default(0) @map("quantidade_vts")
+  createdAt     DateTime   @default(now()) @map("created_at")
+
+  user          User       @relation(fields: [userId], references: [id])
+  tipoRelato    TipoRelato @relation(fields: [tipoRelatoId], references: [id])
+  votos         Voto[]
+
+  @@map("posts")
+}
+
+model Voto {
+  id      Int  @id @default(autoincrement()) @map("id_voto")
+  userId  Int  @map("id_user")
+  postId  Int  @map("id_post")
+
+  user    User @relation(fields: [userId], references: [id])
+  post    Post @relation(fields: [postId], references: [id])
+
+  @@unique([userId, postId]) // Garantir que um usuário vote apenas uma vez por post
+  @@map("votos")
+}
