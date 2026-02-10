@@ -60,6 +60,10 @@ export class AuthService {
                 id: user.id,
                 nome: user.nome,
                 email: user.email,
+                xp: user.xp,
+                nivel: user.nivel,
+                insignias: user.insignias,
+                avatarUrl: user.avatarUrl,
             },
             access_token: token,
         };

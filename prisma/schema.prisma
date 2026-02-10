@@ -15,6 +15,10 @@ model User {
   nome       String
   email      String   @unique
   senha      String
+  xp         Int      @default(0)
+  nivel      Int      @default(1)
+  insignias  String[] @default([])
+  avatarUrl  String?  @map("avatar_url")
   createdAt  DateTime @default(now()) @map("created_at")
   
   posts      Post[]
