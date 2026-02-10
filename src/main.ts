@@ -6,7 +6,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:5173', // Frontend Vite default
+    origin: [
+      'http://localhost:5173', // Frontend local (dev)
+      'https://front-relatos-2fw7.vercel.app' // Frontend Vercel (prod)
+    ],
     credentials: true,
   });
 
