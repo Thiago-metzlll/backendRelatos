@@ -6,16 +6,27 @@ export class CommentsService implements OnModuleInit {
     private db: admin.firestore.Firestore;
 
     onModuleInit() {
-        // Nota: Em produção, estas credenciais devem vir de variáveis de ambiente ou arquivo JSON
-        let credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
-        if (!admin.apps.length && credentialsPath) {
+        const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
+        const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+
+        if (!admin.apps.length) {
             try {
-                // Usar path.resolve para garantir que o caminho esteja correto independente de onde o processo iniciou
-                const resolvedPath = require('path').resolve(credentialsPath);
-                admin.initializeApp({
-                    credential: admin.credential.cert(resolvedPath),
-                });
-                console.log('✅ Firebase Admin SDK inicializado');
+                if (serviceAccountJson) {
+                    // Inicialização via JSON string (ideal para Vercel/Render/Railway)
+                    admin.initializeApp({
+                        credential: admin.credential.cert(JSON.parse(serviceAccountJson)),
+                    });
+                    console.log('✅ Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT');
+                } else if (credentialsPath) {
+                    // Inicialização via arquivo (ideal para desenvolvimento local)
+                    const resolvedPath = require('path').resolve(credentialsPath);
+                    admin.initializeApp({
+                        credential: admin.credential.cert(resolvedPath),
+                    });
+                    console.log('✅ Firebase Admin SDK inicializado via FIREBASE_CREDENTIALS_PATH');
+                } else {
+                    console.warn('⚠️ Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT ou FIREBASE_CREDENTIALS_PATH)');
+                }
             } catch (error) {
                 console.error('❌ Erro ao inicializar Firebase Admin SDK:', error);
             }
