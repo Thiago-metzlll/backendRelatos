@@ -7,8 +7,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'http://localhost:5173', // Frontend local (dev)
-      'https://front-relatos-2fw7.vercel.app' // Frontend Vercel (prod)
+      'http://localhost:5173', // meu frontend local 
+      'https://front-relatos-two.vercel.app/' // frontend Vercel (prod)
     ],
     credentials: true,
   });
