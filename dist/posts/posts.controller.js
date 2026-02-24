@@ -39,6 +39,13 @@ let PostsController = class PostsController {
         const userId = req.user.id;
         return this.postsService.upvote(userId, parseInt(id));
     }
+    async createFromTelegram(body, apiKey) {
+        if (!apiKey || apiKey !== process.env.TELEGRAM_API_KEY) {
+            throw new common_1.UnauthorizedException('API Key inválida');
+        }
+        const anonUserId = parseInt(process.env.ANON_USER_ID || '1');
+        return this.postsService.createPost(anonUserId, body);
+    }
 };
 exports.PostsController = PostsController;
 __decorate([
@@ -80,6 +87,14 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "vote", null);
+__decorate([
+    (0, common_1.Post)('telegram'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Headers)('x-api-key')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [posts_dto_1.CreatePostDto, String]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "createFromTelegram", null);
 exports.PostsController = PostsController = __decorate([
     (0, common_1.Controller)('posts'),
     __metadata("design:paramtypes", [posts_service_1.PostsService])

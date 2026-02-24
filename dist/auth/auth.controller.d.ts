@@ -3,17 +3,12 @@ import type { Response } from 'express';
 export declare class AuthController {
     private authService;
     constructor(authService: AuthService);
-    register(body: any): Promise<{
-        id: number;
-        email: string;
-        nome: string;
-        createdAt: Date;
-    }>;
+    register(body: any): Promise<any>;
     login(body: any, response: Response): Promise<{
         user: {
-            id: number;
-            nome: string;
-            email: string;
+            id: any;
+            nome: any;
+            email: any;
         };
         access_token: string;
     }>;
