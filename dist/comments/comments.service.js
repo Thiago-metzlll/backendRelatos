@@ -45,14 +45,26 @@ const admin = __importStar(require("firebase-admin"));
 let CommentsService = class CommentsService {
     db;
     onModuleInit() {
-        let credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
-        if (!admin.apps.length && credentialsPath) {
+        const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
+        const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
+        if (!admin.apps.length) {
             try {
-                const resolvedPath = require('path').resolve(credentialsPath);
-                admin.initializeApp({
-                    credential: admin.credential.cert(resolvedPath),
-                });
-                console.log('✅ Firebase Admin SDK inicializado');
+                if (serviceAccountJson) {
+                    admin.initializeApp({
+                        credential: admin.credential.cert(JSON.parse(serviceAccountJson)),
+                    });
+                    console.log('✅ Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT');
+                }
+                else if (credentialsPath) {
+                    const resolvedPath = require('path').resolve(credentialsPath);
+                    admin.initializeApp({
+                        credential: admin.credential.cert(resolvedPath),
+                    });
+                    console.log('✅ Firebase Admin SDK inicializado via FIREBASE_CREDENTIALS_PATH');
+                }
+                else {
+                    console.warn('⚠️ Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT ou FIREBASE_CREDENTIALS_PATH)');
+                }
             }
             catch (error) {
                 console.error('❌ Erro ao inicializar Firebase Admin SDK:', error);
