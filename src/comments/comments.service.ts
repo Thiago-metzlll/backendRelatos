@@ -1,9 +1,14 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Optional } from '@nestjs/common';
 import * as admin from 'firebase-admin';
+import { CommentsGateway } from '../events/comments.gateway';
 
 @Injectable()
 export class CommentsService implements OnModuleInit {
     private db: admin.firestore.Firestore;
+
+    constructor(
+        @Optional() private readonly commentsGateway: CommentsGateway,
+    ) { }
 
     onModuleInit() {
         const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
@@ -47,7 +52,14 @@ export class CommentsService implements OnModuleInit {
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
             });
             const doc = await docRef.get();
-            return { id: doc.id, ...doc.data() };
+            const saved = { id: doc.id, ...doc.data() };
+
+            // Emite o novo comentário via WebSocket para todos os clientes do post
+            if (this.commentsGateway) {
+                this.commentsGateway.emitNewComment(data.postId, saved);
+            }
+
+            return saved;
         } catch (error) {
             console.error('❌ Erro ao criar comentário no Firestore:', error);
             throw error;
@@ -63,7 +75,7 @@ export class CommentsService implements OnModuleInit {
         console.log(`🔍 Buscando comentários para o postId: ${postId} (tipo: ${typeof postId})`);
 
         try {
-            // Tivemos que comentar de novo porque o erro 500 voltou. 
+            // Tivemos que comentar de novo porque o erro 500 voltou.
             // Precisamos ver o log do backend para entender o motivo se o índice já está como "Ativo".
             const snapshot = await this.db
                 .collection('comentarios')

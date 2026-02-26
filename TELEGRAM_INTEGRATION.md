@@ -74,26 +74,50 @@ x-api-key: <TELEGRAM_API_KEY>
 
 ---
 
-## Configuração do n8n
+## Configuração no Activepieces
 
-No nó **"Enviar solicitação HTTP"**, configure:
+A automação é composta por 4 steps, executados em sequência quando o bot recebe uma mensagem no Telegram.
 
-| Campo | Valor |
+### Fluxo dos steps
+
+| Step | Tipo | O que faz |
+|---|---|---|
+| 1. Nova mensagem | Telegram Bot (Trigger) | Dispara quando o usuário envia uma mensagem ao bot |
+| 2. Resposta do bot | Telegram Bot | Envia uma mensagem de resposta ao usuario (ex: "Aqui seu post maninho:") |
+| 3. Enviar solicitação HTTP | HTTP | Faz POST para a API criando o relato |
+| 4. Enviar mensagem final | Telegram Bot | Confirma ao usuário que o post foi criado |
+
+---
+
+### Step 3 - Configuracao do HTTP
+
+**Metodo:** POST
+
+**URL:**
+```
+https://sua-api.vercel.app/posts/telegram
+```
+
+**Cabecalhos:**
+
+| Chave | Valor |
 |---|---|
-| Method | `POST` |
-| URL | `https://sua-api.vercel.app/posts/telegram` |
-| Header | `x-api-key` → `{{TELEGRAM_API_KEY}}` |
-| Body | JSON (ver abaixo) |
+| `x-api-key` | valor do `TELEGRAM_API_KEY` no seu `.env` |
+| `Content-Type` | `application/json` |
 
-**Body JSON:**
+**Tipo de Corpo:** JSON
+
+**JSON Body:**
 ```json
 {
-  "conteudo": "={{ $json.message.text }}",
+  "conteudo": "{{trigger.message.text}}",
   "tipoRelatoId": 1
 }
 ```
 
-> `$json.message.text` é o campo que contém o texto da mensagem recebida pelo Telegram Bot no n8n. Ajuste conforme o output do seu nó de trigger.
+A variavel `{{trigger.message.text}}` referencia o texto enviado pelo usuario no step 1 (trigger). O Activepieces resolve essa referencia automaticamente antes de enviar a requisicao.
+
+> O campo `tipoRelatoId` esta fixo em `1` (Tecnologia). Para permitir que o usuario escolha a categoria, seria necessario adicionar um step de selecao antes do HTTP.
 
 ---
 
