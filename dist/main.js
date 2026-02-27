@@ -13,6 +13,7 @@ async function bootstrap() {
         : [
             'http://localhost:5173',
             'https://front-relatos-two.vercel.app',
+            'https://front-relatos-2fw7.vercel.app',
             'https://front-relatos-2fw7-iila76x4c-thiagos-projects-1de5c76e.vercel.app',
         ];
     app.enableCors({
