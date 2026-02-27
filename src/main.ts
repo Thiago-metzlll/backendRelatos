@@ -5,11 +5,16 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const origins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : [
+        'http://localhost:5173',
+        'https://front-relatos-two.vercel.app',
+        'https://front-relatos-2fw7-iila76x4c-thiagos-projects-1de5c76e.vercel.app', // origin from the screenshot
+      ];
+
   app.enableCors({
-    origin: [
-      'http://localhost:5173', // meu frontend local 
-      'https://front-relatos-two.vercel.app' // frontend Vercel (prod)
-    ],
+    origin: origins,
     credentials: true,
   });
 

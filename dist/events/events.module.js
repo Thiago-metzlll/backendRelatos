@@ -6,20 +6,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommentsModule = void 0;
+exports.EventsModule = void 0;
 const common_1 = require("@nestjs/common");
-const comments_service_1 = require("./comments.service");
-const comments_controller_1 = require("./comments.controller");
-const events_module_1 = require("../events/events.module");
-let CommentsModule = class CommentsModule {
+const jwt_1 = require("@nestjs/jwt");
+const comments_gateway_1 = require("./comments.gateway");
+const chat_gateway_1 = require("./chat.gateway");
+let EventsModule = class EventsModule {
 };
-exports.CommentsModule = CommentsModule;
-exports.CommentsModule = CommentsModule = __decorate([
+exports.EventsModule = EventsModule;
+exports.EventsModule = EventsModule = __decorate([
     (0, common_1.Module)({
-        imports: [events_module_1.EventsModule],
-        providers: [comments_service_1.CommentsService],
-        controllers: [comments_controller_1.CommentsController],
-        exports: [comments_service_1.CommentsService],
+        imports: [
+            jwt_1.JwtModule.register({
+                secret: process.env.JWT_SECRET || 'super-secret',
+                signOptions: { expiresIn: '7d' },
+            }),
+        ],
+        providers: [comments_gateway_1.CommentsGateway, chat_gateway_1.ChatGateway],
+        exports: [comments_gateway_1.CommentsGateway],
     })
-], CommentsModule);
-//# sourceMappingURL=comments.module.js.map
+], EventsModule);
+//# sourceMappingURL=events.module.js.map
