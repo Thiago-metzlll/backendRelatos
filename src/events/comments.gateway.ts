@@ -18,20 +18,20 @@ import * as cookie from 'cookie';
     origin: process.env.CORS_ORIGINS?.split(',') || [
       'http://localhost:5173',
       'https://front-relatos-two.vercel.app',
+      'https://front-relatos-2fw7.vercel.app',
       'https://front-relatos-2fw7-iila76x4c-thiagos-projects-1de5c76e.vercel.app',
     ],
     credentials: true,
   },
 })
 export class CommentsGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+  implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
   private logger = new Logger('CommentsGateway');
 
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(private readonly jwtService: JwtService) { }
 
   async handleConnection(client: Socket) {
     try {
