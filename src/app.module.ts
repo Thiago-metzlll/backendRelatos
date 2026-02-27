@@ -8,8 +8,14 @@ import { CommentsModule } from './comments/comments.module';
 import { EventsModule } from './events/events.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, PostsModule, CommentsModule, EventsModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    PostsModule,
+    CommentsModule,
+    EventsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

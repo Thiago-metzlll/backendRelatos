@@ -4,9 +4,9 @@ import { CommentsController } from './comments.controller';
 import { EventsModule } from '../events/events.module';
 
 @Module({
-    imports: [EventsModule],
-    providers: [CommentsService],
-    controllers: [CommentsController],
-    exports: [CommentsService],
+  imports: [EventsModule],
+  providers: [CommentsService],
+  controllers: [CommentsController],
+  exports: [CommentsService],
 })
-export class CommentsModule { }
+export class CommentsModule {}

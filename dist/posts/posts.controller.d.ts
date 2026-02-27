@@ -3,10 +3,89 @@ import { CreatePostDto } from './posts.dto';
 export declare class PostsController {
     private postsService;
     constructor(postsService: PostsService);
-    findAll(tipoRelatoId?: string): Promise<any>;
-    getMyPosts(req: any): Promise<any>;
-    findAllCategories(): Promise<any>;
-    create(createPostDto: CreatePostDto, req: any): Promise<any>;
-    vote(id: string, req: any): Promise<any>;
-    createFromTelegram(body: CreatePostDto, apiKey: string): Promise<any>;
+    findAll(tipoRelatoId?: string): Promise<({
+        user: {
+            nome: string;
+        };
+        tipoRelato: {
+            id: number;
+            nome: string;
+            descricao: string | null;
+        };
+    } & {
+        id: number;
+        createdAt: Date;
+        conteudo: string;
+        quantidadeVts: number;
+        userId: number;
+        tipoRelatoId: number;
+    })[]>;
+    getMyPosts(req: any): Promise<({
+        user: {
+            id: number;
+            email: string;
+            nome: string;
+            senha: string;
+            createdAt: Date;
+        };
+        tipoRelato: {
+            id: number;
+            nome: string;
+            descricao: string | null;
+        };
+    } & {
+        id: number;
+        createdAt: Date;
+        conteudo: string;
+        quantidadeVts: number;
+        userId: number;
+        tipoRelatoId: number;
+    })[]>;
+    findAllCategories(): Promise<{
+        id: number;
+        nome: string;
+        descricao: string | null;
+    }[]>;
+    create(createPostDto: CreatePostDto, req: any): Promise<{
+        user: {
+            nome: string;
+        };
+        tipoRelato: {
+            id: number;
+            nome: string;
+            descricao: string | null;
+        };
+    } & {
+        id: number;
+        createdAt: Date;
+        conteudo: string;
+        quantidadeVts: number;
+        userId: number;
+        tipoRelatoId: number;
+    }>;
+    vote(id: string, req: any): Promise<{
+        id: number;
+        createdAt: Date;
+        conteudo: string;
+        quantidadeVts: number;
+        userId: number;
+        tipoRelatoId: number;
+    }>;
+    createFromTelegram(body: CreatePostDto, apiKey: string): Promise<{
+        user: {
+            nome: string;
+        };
+        tipoRelato: {
+            id: number;
+            nome: string;
+            descricao: string | null;
+        };
+    } & {
+        id: number;
+        createdAt: Date;
+        conteudo: string;
+        quantidadeVts: number;
+        userId: number;
+        tipoRelatoId: number;
+    }>;
 }

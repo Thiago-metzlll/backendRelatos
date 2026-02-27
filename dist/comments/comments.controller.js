@@ -31,7 +31,7 @@ let CommentsController = class CommentsController {
         const userId = req.user.id;
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: { nome: true }
+            select: { nome: true },
         });
         return this.commentsService.createComment({
             postId: parseInt(postId),

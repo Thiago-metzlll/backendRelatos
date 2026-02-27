@@ -1,6 +1,9 @@
 import { OnModuleInit } from '@nestjs/common';
+import { CommentsGateway } from '../events/comments.gateway';
 export declare class CommentsService implements OnModuleInit {
+    private readonly commentsGateway;
     private db;
+    constructor(commentsGateway: CommentsGateway);
     onModuleInit(): void;
     createComment(data: {
         postId: number;

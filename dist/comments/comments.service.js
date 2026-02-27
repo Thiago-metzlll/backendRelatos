@@ -38,12 +38,23 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentsService = void 0;
 const common_1 = require("@nestjs/common");
 const admin = __importStar(require("firebase-admin"));
+const comments_gateway_1 = require("../events/comments.gateway");
 let CommentsService = class CommentsService {
+    commentsGateway;
     db;
+    constructor(commentsGateway) {
+        this.commentsGateway = commentsGateway;
+    }
     onModuleInit() {
         const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
         const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -85,7 +96,11 @@ let CommentsService = class CommentsService {
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
             });
             const doc = await docRef.get();
-            return { id: doc.id, ...doc.data() };
+            const saved = { id: doc.id, ...doc.data() };
+            if (this.commentsGateway) {
+                this.commentsGateway.emitNewComment(data.postId, saved);
+            }
+            return saved;
         }
         catch (error) {
             console.error('❌ Erro ao criar comentário no Firestore:', error);
@@ -104,7 +119,7 @@ let CommentsService = class CommentsService {
                 .where('postId', '==', postId)
                 .get();
             console.log(`✅ Consulta realizada. Documentos encontrados: ${snapshot.size}`);
-            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         }
         catch (error) {
             console.error('❌ Erro detalhado ao buscar comentários:', error);
@@ -127,6 +142,8 @@ let CommentsService = class CommentsService {
 };
 exports.CommentsService = CommentsService;
 exports.CommentsService = CommentsService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Optional)()),
+    __metadata("design:paramtypes", [comments_gateway_1.CommentsGateway])
 ], CommentsService);
 //# sourceMappingURL=comments.service.js.map
