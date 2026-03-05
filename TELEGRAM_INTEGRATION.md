@@ -5,7 +5,9 @@ Este documento descreve como configurar a automação do Telegram para criar rel
 ## Como funciona
 
 ```
-Telegram → n8n/automação → POST /posts/telegram → Relato criado como "Anônimo"
+Telegram (Bot 1) → Activepieces → POST /posts/telegram → Relato "Anônimo"
+Telegram (Bot 2) → Activepieces (Gerador) → POST /posts/activepieces → Relato "Anônimo"
+Webhook Externo → POST /posts/webhook → Relato "Anônimo"
 ```
 
 A rota `POST /posts/telegram` não exige login (JWT). Em vez disso, ela valida uma **API Key secreta** passada no header `x-api-key`. O post é atribuído automaticamente a um usuário anônimo fixo no banco de dados.
@@ -40,7 +42,7 @@ ANON_USER_ID=5  # o id do usuário anônimo criado acima
 
 ## Endpoint
 
-### `POST /posts/telegram`
+### `POST /posts/telegram`, `POST /posts/activepieces` e `POST /posts/webhook`
 
 **Header obrigatório:**
 ```
@@ -50,7 +52,7 @@ x-api-key: <TELEGRAM_API_KEY>
 **Body (JSON):**
 ```json
 {
-  "conteudo": "Texto do relato",
+  "conteudo": "Texto do relato ou gerado pela automação",
   "tipoRelatoId": 1
 }
 ```
@@ -96,6 +98,8 @@ A automação é composta por 4 steps, executados em sequência quando o bot rec
 **URL:**
 ```
 https://sua-api.vercel.app/posts/telegram
+(ou /posts/activepieces para o segundo bot)
+(ou /posts/webhook para automações de sistema)
 ```
 
 **Cabecalhos:**

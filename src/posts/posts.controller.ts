@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
-  constructor(private postsService: PostsService) {}
+  constructor(private postsService: PostsService) { }
 
   @Get()
   async findAll(@Query('tipoRelatoId') tipoRelatoId?: string) {
@@ -56,7 +56,39 @@ export class PostsController {
     @Headers('x-api-key') apiKey: string,
   ) {
     if (!apiKey || apiKey !== process.env.TELEGRAM_API_KEY) {
-      throw new UnauthorizedException('API Key inválida');
+      throw new UnauthorizedException('Chave de API inválida');
+    }
+    const anonUserId = parseInt(process.env.ANON_USER_ID || '1');
+    return this.postsService.createPost(anonUserId, body);
+  }
+
+  /**
+   * Rota de integração para Activepieces (segundo bot).
+   * Persiste relatos gerados ou diretos sob o usuário anônimo.
+   */
+  @Post('activepieces')
+  async createFromActivepieces(
+    @Body() body: CreatePostDto,
+    @Headers('x-api-key') apiKey: string,
+  ) {
+    if (!apiKey || apiKey !== process.env.TELEGRAM_API_KEY) {
+      throw new UnauthorizedException('Chave de API inválida');
+    }
+    const anonUserId = parseInt(process.env.ANON_USER_ID || '1');
+    return this.postsService.createPost(anonUserId, body);
+  }
+
+  /**
+   * Rota de webhook genérica para integração com serviços externos.
+   * Persiste o conteúdo recebido como postagem de usuário anônimo.
+   */
+  @Post('webhook')
+  async createFromWebhook(
+    @Body() body: CreatePostDto,
+    @Headers('x-api-key') apiKey: string,
+  ) {
+    if (!apiKey || apiKey !== process.env.TELEGRAM_API_KEY) {
+      throw new UnauthorizedException('Chave de API inválida');
     }
     const anonUserId = parseInt(process.env.ANON_USER_ID || '1');
     return this.postsService.createPost(anonUserId, body);
