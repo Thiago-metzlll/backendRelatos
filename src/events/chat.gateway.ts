@@ -20,6 +20,7 @@ export interface ChatMessage {
   createdAt: string;
 }
 
+/*
 @WebSocketGateway({
   namespace: '/chat',
   cors: {
@@ -32,6 +33,7 @@ export interface ChatMessage {
     credentials: true,
   },
 })
+*/
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;

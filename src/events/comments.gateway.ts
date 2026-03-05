@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common';
 import * as cookie from 'cookie';
 
+/*
 @WebSocketGateway({
   namespace: '/comments',
   cors: {
@@ -24,6 +25,7 @@ import * as cookie from 'cookie';
     credentials: true,
   },
 })
+*/
 export class CommentsGateway
   implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()

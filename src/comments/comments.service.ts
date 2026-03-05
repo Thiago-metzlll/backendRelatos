@@ -6,7 +6,7 @@ import { CommentsGateway } from '../events/comments.gateway';
 export class CommentsService implements OnModuleInit {
   private db: admin.firestore.Firestore;
 
-  constructor(@Optional() private readonly commentsGateway: CommentsGateway) {}
+  constructor(@Optional() private readonly commentsGateway: CommentsGateway) { }
 
   onModuleInit() {
     const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
@@ -20,7 +20,7 @@ export class CommentsService implements OnModuleInit {
             credential: admin.credential.cert(JSON.parse(serviceAccountJson)),
           });
           console.log(
-            '✅ Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT',
+            'Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT',
           );
         } else if (credentialsPath) {
           // Inicialização via arquivo (ideal para desenvolvimento local)
@@ -29,23 +29,23 @@ export class CommentsService implements OnModuleInit {
             credential: admin.credential.cert(resolvedPath),
           });
           console.log(
-            '✅ Firebase Admin SDK inicializado via FIREBASE_CREDENTIALS_PATH',
+            'Firebase Admin SDK inicializado via FIREBASE_CREDENTIALS_PATH',
           );
         } else {
           console.warn(
-            '⚠️ Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT ou FIREBASE_CREDENTIALS_PATH)',
+            'Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT ou FIREBASE_CREDENTIALS_PATH)',
           );
         }
       } catch (error) {
-        console.error('❌ Erro ao inicializar Firebase Admin SDK:', error);
+        console.error('Erro ao inicializar Firebase Admin SDK:', error);
       }
     }
 
     try {
       this.db = admin.firestore();
-      console.log('✅ Firebase (Firestore) conectado com sucesso!');
+      console.log('Firebase (Firestore) conectado com sucesso!');
     } catch (error) {
-      console.error('❌ Erro ao conectar ao Firestore:', error);
+      console.error('Erro ao conectar ao Firestore:', error);
     }
   }
 
@@ -63,10 +63,12 @@ export class CommentsService implements OnModuleInit {
       const doc = await docRef.get();
       const saved = { id: doc.id, ...doc.data() };
 
-      // Emite o novo comentário via WebSocket para todos os clientes do post
+      // Emissão via WebSocket desativada para simplificação acadêmica
+      /*
       if (this.commentsGateway) {
         this.commentsGateway.emitNewComment(data.postId, saved);
       }
+      */
 
       return saved;
     } catch (error) {
@@ -84,12 +86,11 @@ export class CommentsService implements OnModuleInit {
     }
 
     console.log(
-      `🔍 Buscando comentários para o postId: ${postId} (tipo: ${typeof postId})`,
+      `Buscando comentários para o postId: ${postId} (tipo: ${typeof postId})`,
     );
 
     try {
-      // Tivemos que comentar de novo porque o erro 500 voltou.
-      // Precisamos ver o log do backend para entender o motivo se o índice já está como "Ativo".
+      // Consulta ao Firestore para recuperar comentários vinculados ao post.
       const snapshot = await this.db
         .collection('comentarios')
         .where('postId', '==', postId)
@@ -97,11 +98,11 @@ export class CommentsService implements OnModuleInit {
         .get();
 
       console.log(
-        `✅ Consulta realizada. Documentos encontrados: ${snapshot.size}`,
+        `Consulta realizada. Documentos encontrados: ${snapshot.size}`,
       );
       return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-      console.error('❌ Erro detalhado ao buscar comentários:', error);
+      console.error('Erro detalhado ao buscar comentários:', error);
       throw error;
     }
   }
