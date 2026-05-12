@@ -9,19 +9,25 @@ export class CommentsService implements OnModuleInit {
   constructor(@Optional() private readonly commentsGateway: CommentsGateway) { }
 
   onModuleInit() {
-    const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
+    const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH || process.env.FIREBASE_KEY_PATH;
     const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
 
     if (!admin.apps.length) {
       try {
         if (serviceAccountJson) {
           // Inicialização via JSON string (ideal para Vercel/Render/Railway)
-          admin.initializeApp({
-            credential: admin.credential.cert(JSON.parse(serviceAccountJson)),
-          });
-          console.log(
-            'Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT',
-          );
+          // Tenta fazer o parse do JSON. Se falhar, registra o erro mas não crasha o app inteiro se possível.
+          try {
+            const cert = typeof serviceAccountJson === 'string' ? JSON.parse(serviceAccountJson) : serviceAccountJson;
+            admin.initializeApp({
+              credential: admin.credential.cert(cert),
+            });
+            console.log(
+              'Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT',
+            );
+          } catch (jsonError) {
+            console.error('Erro ao processar FIREBASE_SERVICE_ACCOUNT (JSON inválido):', jsonError);
+          }
         } else if (credentialsPath) {
           // Inicialização via arquivo (ideal para desenvolvimento local)
           const resolvedPath = require('path').resolve(credentialsPath);
@@ -29,11 +35,11 @@ export class CommentsService implements OnModuleInit {
             credential: admin.credential.cert(resolvedPath),
           });
           console.log(
-            'Firebase Admin SDK inicializado via FIREBASE_CREDENTIALS_PATH',
+            `Firebase Admin SDK inicializado via arquivo: ${credentialsPath}`,
           );
         } else {
           console.warn(
-            'Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT ou FIREBASE_CREDENTIALS_PATH)',
+            'Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT, FIREBASE_CREDENTIALS_PATH ou FIREBASE_KEY_PATH)',
           );
         }
       } catch (error) {
