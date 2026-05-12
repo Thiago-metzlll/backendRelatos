@@ -48,10 +48,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommentsGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const jwt_1 = require("@nestjs/jwt");
 const common_1 = require("@nestjs/common");
 const cookie = __importStar(require("cookie"));
-let CommentsGateway = class CommentsGateway {
+class CommentsGateway {
     jwtService;
     server;
     logger = new common_1.Logger('CommentsGateway');
@@ -98,7 +97,7 @@ let CommentsGateway = class CommentsGateway {
         this.server.to(room).emit('new-comment', comment);
         this.logger.log(`[comments] Emitido 'new-comment' para o room ${room}`);
     }
-};
+}
 exports.CommentsGateway = CommentsGateway;
 __decorate([
     (0, websockets_1.WebSocketServer)(),
@@ -120,19 +119,4 @@ __decorate([
     __metadata("design:paramtypes", [Number, socket_io_1.Socket]),
     __metadata("design:returntype", void 0)
 ], CommentsGateway.prototype, "handleLeavePost", null);
-exports.CommentsGateway = CommentsGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({
-        namespace: '/comments',
-        cors: {
-            origin: process.env.CORS_ORIGINS?.split(',') || [
-                'http://localhost:5173',
-                'https://front-relatos-two.vercel.app',
-                'https://front-relatos-2fw7.vercel.app',
-                'https://front-relatos-2fw7-iila76x4c-thiagos-projects-1de5c76e.vercel.app',
-            ],
-            credentials: true,
-        },
-    }),
-    __metadata("design:paramtypes", [jwt_1.JwtService])
-], CommentsGateway);
 //# sourceMappingURL=comments.gateway.js.map

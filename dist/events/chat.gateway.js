@@ -48,11 +48,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const jwt_1 = require("@nestjs/jwt");
 const common_1 = require("@nestjs/common");
 const cookie = __importStar(require("cookie"));
 const admin = __importStar(require("firebase-admin"));
-let ChatGateway = class ChatGateway {
+class ChatGateway {
     jwtService;
     server;
     logger = new common_1.Logger('ChatGateway');
@@ -134,7 +133,7 @@ let ChatGateway = class ChatGateway {
             client.emit('chat-history', []);
         }
     }
-};
+}
 exports.ChatGateway = ChatGateway;
 __decorate([
     (0, websockets_1.WebSocketServer)(),
@@ -155,19 +154,4 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleGetHistory", null);
-exports.ChatGateway = ChatGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({
-        namespace: '/chat',
-        cors: {
-            origin: process.env.CORS_ORIGINS?.split(',') || [
-                'http://localhost:5173',
-                'https://front-relatos-two.vercel.app',
-                'https://front-relatos-2fw7.vercel.app',
-                'https://front-relatos-2fw7-iila76x4c-thiagos-projects-1de5c76e.vercel.app',
-            ],
-            credentials: true,
-        },
-    }),
-    __metadata("design:paramtypes", [jwt_1.JwtService])
-], ChatGateway);
 //# sourceMappingURL=chat.gateway.js.map

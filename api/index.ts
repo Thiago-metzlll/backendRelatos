@@ -1,15 +1,19 @@
+import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
 import * as express from 'express';
 import cookieParser from 'cookie-parser';
 
-const server = express();
+let cachedServer: express.Express;
 
-export const createServer = async (expressInstance: express.Express) => {
+export const createServer = async () => {
+  if (cachedServer) return cachedServer;
+
+  const expressApp = express();
   const app = await NestFactory.create(
     AppModule,
-    new ExpressAdapter(expressInstance),
+    new ExpressAdapter(expressApp),
   );
 
   const origins = process.env.CORS_ORIGINS
@@ -29,11 +33,12 @@ export const createServer = async (expressInstance: express.Express) => {
   app.use(cookieParser());
 
   await app.init();
-  return app;
+  cachedServer = expressApp;
+  return expressApp;
 };
 
 // Vercel entry point
 export default async (req: any, res: any) => {
-  await createServer(server);
-  server(req, res);
+  const serverInstance = await createServer();
+  serverInstance(req, res);
 };
