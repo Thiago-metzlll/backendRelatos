@@ -56,37 +56,43 @@ let CommentsService = class CommentsService {
         this.commentsGateway = commentsGateway;
     }
     onModuleInit() {
-        const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH;
+        const credentialsPath = process.env.FIREBASE_CREDENTIALS_PATH || process.env.FIREBASE_KEY_PATH;
         const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
         if (!admin.apps.length) {
             try {
                 if (serviceAccountJson) {
-                    admin.initializeApp({
-                        credential: admin.credential.cert(JSON.parse(serviceAccountJson)),
-                    });
-                    console.log('✅ Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT');
+                    try {
+                        const cert = typeof serviceAccountJson === 'string' ? JSON.parse(serviceAccountJson) : serviceAccountJson;
+                        admin.initializeApp({
+                            credential: admin.credential.cert(cert),
+                        });
+                        console.log('Firebase Admin SDK inicializado via FIREBASE_SERVICE_ACCOUNT');
+                    }
+                    catch (jsonError) {
+                        console.error('Erro ao processar FIREBASE_SERVICE_ACCOUNT (JSON inválido):', jsonError);
+                    }
                 }
                 else if (credentialsPath) {
                     const resolvedPath = require('path').resolve(credentialsPath);
                     admin.initializeApp({
                         credential: admin.credential.cert(resolvedPath),
                     });
-                    console.log('✅ Firebase Admin SDK inicializado via FIREBASE_CREDENTIALS_PATH');
+                    console.log(`Firebase Admin SDK inicializado via arquivo: ${credentialsPath}`);
                 }
                 else {
-                    console.warn('⚠️ Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT ou FIREBASE_CREDENTIALS_PATH)');
+                    console.warn('Nenhuma credencial do Firebase encontrada (FIREBASE_SERVICE_ACCOUNT, FIREBASE_CREDENTIALS_PATH ou FIREBASE_KEY_PATH)');
                 }
             }
             catch (error) {
-                console.error('❌ Erro ao inicializar Firebase Admin SDK:', error);
+                console.error('Erro ao inicializar Firebase Admin SDK:', error);
             }
         }
         try {
             this.db = admin.firestore();
-            console.log('✅ Firebase (Firestore) conectado com sucesso!');
+            console.log('Firebase (Firestore) conectado com sucesso!');
         }
         catch (error) {
-            console.error('❌ Erro ao conectar ao Firestore:', error);
+            console.error('Erro ao conectar ao Firestore:', error);
         }
     }
     async createComment(data) {
@@ -97,9 +103,6 @@ let CommentsService = class CommentsService {
             });
             const doc = await docRef.get();
             const saved = { id: doc.id, ...doc.data() };
-            if (this.commentsGateway) {
-                this.commentsGateway.emitNewComment(data.postId, saved);
-            }
             return saved;
         }
         catch (error) {
@@ -112,17 +115,17 @@ let CommentsService = class CommentsService {
             console.error('❌ Firestore não foi inicializado. Verifique as credenciais no .env');
             throw new Error('Firestore não inicializado');
         }
-        console.log(`🔍 Buscando comentários para o postId: ${postId} (tipo: ${typeof postId})`);
+        console.log(`Buscando comentários para o postId: ${postId} (tipo: ${typeof postId})`);
         try {
             const snapshot = await this.db
                 .collection('comentarios')
                 .where('postId', '==', postId)
                 .get();
-            console.log(`✅ Consulta realizada. Documentos encontrados: ${snapshot.size}`);
+            console.log(`Consulta realizada. Documentos encontrados: ${snapshot.size}`);
             return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         }
         catch (error) {
-            console.error('❌ Erro detalhado ao buscar comentários:', error);
+            console.error('Erro detalhado ao buscar comentários:', error);
             throw error;
         }
     }

@@ -12,7 +12,7 @@ const client_1 = require("@prisma/client");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     async onModuleInit() {
         await this.$connect();
-        console.log('✅ Prisma (Supabase) conectado com sucesso!');
+        console.log('Prisma (Supabase) conectado com sucesso!');
     }
     async onModuleDestroy() {
         await this.$disconnect();

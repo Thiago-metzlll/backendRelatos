@@ -88,4 +88,38 @@ export declare class PostsController {
         userId: number;
         tipoRelatoId: number;
     }>;
+    createFromActivepieces(body: CreatePostDto, apiKey: string): Promise<{
+        user: {
+            nome: string;
+        };
+        tipoRelato: {
+            id: number;
+            nome: string;
+            descricao: string | null;
+        };
+    } & {
+        id: number;
+        createdAt: Date;
+        conteudo: string;
+        quantidadeVts: number;
+        userId: number;
+        tipoRelatoId: number;
+    }>;
+    createFromWebhook(body: CreatePostDto, apiKey: string): Promise<{
+        user: {
+            nome: string;
+        };
+        tipoRelato: {
+            id: number;
+            nome: string;
+            descricao: string | null;
+        };
+    } & {
+        id: number;
+        createdAt: Date;
+        conteudo: string;
+        quantidadeVts: number;
+        userId: number;
+        tipoRelatoId: number;
+    }>;
 }
